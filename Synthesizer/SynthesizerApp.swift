@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import Foundation
+import Gong
 
 @main
 struct SynthesizerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear(perform: MIDI.connect)
+                .onDisappear(perform: MIDI.connect)
         }
     }
 }
