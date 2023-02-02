@@ -10,6 +10,7 @@ import Gong
 
 struct ContentView: View {
     
+    @State public var synth = Synth<any SynthProtocol>()
     @State private var observerTokens = [MIDIObserverTokens]()
     
     var body: some View {
@@ -27,13 +28,13 @@ extension ContentView {
     
     func subscribe() {
         observerTokens.append(MIDI.addObserver(self))
-        Synth.shared.volume = 0.5
+        synth.volume = 0.5
     }
     
     func unsubscribe() {
         for observerTokens in observerTokens {
             MIDI.removeObserver(observerTokens)
-            Synth.shared.volume = 0.0
+            synth.volume = 0.0
         }
     }
     
@@ -50,10 +51,13 @@ extension ContentView: MIDIObserver {
         case let .noteOn(_, key, _):
             print(packet.message)
             print(key)
-            Oscillator.frequency = Oscillator.midiNoteToFreq(key)
+            let frequency: Float = Oscillator.midiNoteToFreq(key)
+            print(frequency)
+            synth.attachSourceNode(frequency: frequency)
         case let .noteOff(_, key, _):
             print(packet.message)
             print(key)
+//            dettach
         default:
             break
         }

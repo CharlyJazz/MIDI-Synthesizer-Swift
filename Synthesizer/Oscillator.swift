@@ -7,14 +7,13 @@
 
 import Foundation
 
-typealias Signal = (Float) -> (Float)
+typealias Signal = (Float, Float) -> (Float)
 
 struct Oscillator {
     static var amplitude: Float = 1
-    static var frequency: Float = 440
 
-    static let sine = { (time: Float) -> Float in
-        return Oscillator.amplitude * sin(2.0 * Float.pi * Oscillator.frequency * time)
+    static let sine = { (time: Float, frequency: Float) -> Float in
+        return Oscillator.amplitude * sin(2.0 * Float.pi * frequency * time)
     }
     
     static let midiNoteToFreq = { (midiNumber: UInt8) -> Float in

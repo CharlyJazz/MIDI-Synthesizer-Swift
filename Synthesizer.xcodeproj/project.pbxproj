@@ -14,6 +14,9 @@
 		FD66864C2968D8A700FD8C4A /* SynthesizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66864B2968D8A700FD8C4A /* SynthesizerTests.swift */; };
 		FD6686562968D8A700FD8C4A /* SynthesizerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686552968D8A700FD8C4A /* SynthesizerUITests.swift */; };
 		FD6686582968D8A700FD8C4A /* SynthesizerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686572968D8A700FD8C4A /* SynthesizerUITestsLaunchTests.swift */; };
+		FD6686662968D9CD00FD8C4A /* Gong in Frameworks */ = {isa = PBXBuildFile; productRef = FD6686652968D9CD00FD8C4A /* Gong */; };
+		FD66866A2968DD3C00FD8C4A /* Synth.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686692968DD3C00FD8C4A /* Synth.swift */; };
+		FD66866C2968E6EF00FD8C4A /* Oscillator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66866B2968E6EF00FD8C4A /* Oscillator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +48,8 @@
 		FD6686512968D8A700FD8C4A /* SynthesizerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SynthesizerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD6686552968D8A700FD8C4A /* SynthesizerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthesizerUITests.swift; sourceTree = "<group>"; };
 		FD6686572968D8A700FD8C4A /* SynthesizerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthesizerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		FD6686692968DD3C00FD8C4A /* Synth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synth.swift; sourceTree = "<group>"; };
+		FD66866B2968E6EF00FD8C4A /* Oscillator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Oscillator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD6686662968D9CD00FD8C4A /* Gong in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +106,8 @@
 				FD66863D2968D8A700FD8C4A /* Assets.xcassets */,
 				FD6686422968D8A700FD8C4A /* Synthesizer.entitlements */,
 				FD66863F2968D8A700FD8C4A /* Preview Content */,
+				FD6686692968DD3C00FD8C4A /* Synth.swift */,
+				FD66866B2968E6EF00FD8C4A /* Oscillator.swift */,
 			);
 			path = Synthesizer;
 			sourceTree = "<group>";
@@ -145,6 +153,9 @@
 			dependencies = (
 			);
 			name = Synthesizer;
+			packageProductDependencies = (
+				FD6686652968D9CD00FD8C4A /* Gong */,
+			);
 			productName = Synthesizer;
 			productReference = FD6686362968D8A700FD8C4A /* Synthesizer.app */;
 			productType = "com.apple.product-type.application";
@@ -217,6 +228,9 @@
 				Base,
 			);
 			mainGroup = FD66862D2968D8A700FD8C4A;
+			packageReferences = (
+				FD6686642968D9CD00FD8C4A /* XCRemoteSwiftPackageReference "Gong" */,
+			);
 			productRefGroup = FD6686372968D8A700FD8C4A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -259,8 +273,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD66866A2968DD3C00FD8C4A /* Synth.swift in Sources */,
 				FD66863C2968D8A700FD8C4A /* ContentView.swift in Sources */,
 				FD66863A2968D8A700FD8C4A /* SynthesizerApp.swift in Sources */,
+				FD66866C2968E6EF00FD8C4A /* Oscillator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -568,6 +584,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FD6686642968D9CD00FD8C4A /* XCRemoteSwiftPackageReference "Gong" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dclelland/Gong";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FD6686652968D9CD00FD8C4A /* Gong */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FD6686642968D9CD00FD8C4A /* XCRemoteSwiftPackageReference "Gong" */;
+			productName = Gong;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FD66862E2968D8A700FD8C4A /* Project object */;
 }
