@@ -9,8 +9,12 @@ import AVFoundation
 import Foundation
 
 protocol SynthProtocol: ObservableObject {
-    func attachSourceNode(frequency: Float)
+    func attachSourceNode(key: UInt8)
+    func detachSourceNode(key: UInt8)
+    func shutdownAVAudioEngine()
 }
+
+let LIST_MIDI_CODE = (21...108)
 
 class Synth<SynthProtocol> {
     // MARK: Properties
@@ -24,9 +28,10 @@ class Synth<SynthProtocol> {
         }
     }
     private var audioEngine: AVAudioEngine
-    private var time: Float = 0
-    private let sampleRate: Double
     private let deltaTime: Float
+    private var hashNotesTimes = [UInt8: Float]()
+    private var hashNotesSourceNodes = [UInt8: AVAudioSourceNode]()
+    private let sampleRate: Double
     private let mainMixer: AVAudioMixerNode
     private let outputNode: AVAudioOutputNode
     private let inputFormat: NSObject?
@@ -35,12 +40,15 @@ class Synth<SynthProtocol> {
     
     init(signal: @escaping Signal = Oscillator.sine) {
         audioEngine = AVAudioEngine()
+        
+        for code in LIST_MIDI_CODE {
+            self.hashNotesTimes[UInt8(code)] = 0
+        }
 
         self.mainMixer = audioEngine.mainMixerNode
         self.outputNode = audioEngine.outputNode
         self.format = outputNode.inputFormat(forBus: 0)
         self.sampleRate = self.format.sampleRate
-        
         self.inputFormat = AVAudioFormat(
             commonFormat: self.format.commonFormat,
             sampleRate: self.sampleRate,
@@ -61,35 +69,45 @@ class Synth<SynthProtocol> {
            print("Could not start engine: \(error.localizedDescription)")
         }
     }
- 
-    // MARK: Public Functions
-    
-    private func createSourceNode(frequency: Float) -> AVAudioSourceNode {
+     
+    private func createSourceNode(frequency: Float, midiKeyCode: UInt8) -> AVAudioSourceNode {
         return AVAudioSourceNode { (_, _, frameCount, audioBufferList) -> OSStatus in
            let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
            for frame in 0..<Int(frameCount) {
-//               Create self.time and a self.deltaTime for every note
-//               I can use a Hash Map where every Midi Code is a Key and the
-//               time and deltatime are par of the value as dict
-//               So I need and to the arguments of this method the midi key
-               let sampleVal = self.signal(self.time, frequency)
-               self.time += self.deltaTime
-               for buffer in ablPointer {
-                   let buf: UnsafeMutableBufferPointer<Float> = UnsafeMutableBufferPointer(buffer)
-                   buf[frame] = sampleVal
+               if ((self.hashNotesTimes[midiKeyCode]) != nil) {
+                   let sampleVal = self.signal(self.hashNotesTimes[midiKeyCode]!, frequency)
+                   self.hashNotesTimes[midiKeyCode]! += self.deltaTime
+                   for buffer in ablPointer {
+                       let buf: UnsafeMutableBufferPointer<Float> = UnsafeMutableBufferPointer(buffer)
+                       buf[frame] = sampleVal
+                   }
                }
            }
            return noErr
        }
     }
     
-    public func attachSourceNode(frequency: Float) {
-        let sourceNode = createSourceNode(frequency: frequency)
+    public func attachSourceNode(midiKeyCode: UInt8) {
+        let frequency: Float = Oscillator.midiNoteToFreq(midiKeyCode)
+        let sourceNode = createSourceNode(frequency: frequency,  midiKeyCode: midiKeyCode)
+        hashNotesSourceNodes[midiKeyCode] = sourceNode
         audioEngine.attach(sourceNode)
         audioEngine.connect(
             sourceNode,
             to: self.mainMixer,
             format: self.inputFormat as? AVAudioFormat
         )
+    }
+    
+    public func detachSourceNode(midiKeyCode: UInt8) {
+        if let sourceNode = self.hashNotesSourceNodes[midiKeyCode] {
+            audioEngine.detach(sourceNode)
+            self.hashNotesSourceNodes[midiKeyCode] = nil
+        }
+    }
+    
+    public func shutdownAVAudioEngine() {
+        self.audioEngine.disconnectNodeInput(self.mainMixer)
+        self.audioEngine.disconnectNodeOutput(self.outputNode)
     }
 }

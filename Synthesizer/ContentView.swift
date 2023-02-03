@@ -32,9 +32,9 @@ extension ContentView {
     }
     
     func unsubscribe() {
+        synth.shutdownAVAudioEngine()
         for observerTokens in observerTokens {
             MIDI.removeObserver(observerTokens)
-            synth.volume = 0.0
         }
     }
     
@@ -49,15 +49,9 @@ extension ContentView: MIDIObserver {
     func receive(_ packet: MIDIPacket, from source: MIDISource) {
         switch packet.message {
         case let .noteOn(_, key, _):
-            print(packet.message)
-            print(key)
-            let frequency: Float = Oscillator.midiNoteToFreq(key)
-            print(frequency)
-            synth.attachSourceNode(frequency: frequency)
+            synth.attachSourceNode(midiKeyCode: key)
         case let .noteOff(_, key, _):
-            print(packet.message)
-            print(key)
-//            dettach
+            synth.detachSourceNode(midiKeyCode: key)
         default:
             break
         }
