@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FD1F702329A7DD8800B2D690 /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1F702229A7DD8800B2D690 /* Keyboard.swift */; };
 		FD66863A2968D8A700FD8C4A /* SynthesizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686392968D8A700FD8C4A /* SynthesizerApp.swift */; };
 		FD66863C2968D8A700FD8C4A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66863B2968D8A700FD8C4A /* ContentView.swift */; };
 		FD66863E2968D8A700FD8C4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD66863D2968D8A700FD8C4A /* Assets.xcassets */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FD1F702229A7DD8800B2D690 /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 		FD6686362968D8A700FD8C4A /* Synthesizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Synthesizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD6686392968D8A700FD8C4A /* SynthesizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthesizerApp.swift; sourceTree = "<group>"; };
 		FD66863B2968D8A700FD8C4A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 				FD66863F2968D8A700FD8C4A /* Preview Content */,
 				FD6686692968DD3C00FD8C4A /* Synth.swift */,
 				FD66866B2968E6EF00FD8C4A /* Oscillator.swift */,
+				FD1F702229A7DD8800B2D690 /* Keyboard.swift */,
 			);
 			path = Synthesizer;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 			files = (
 				FD66866A2968DD3C00FD8C4A /* Synth.swift in Sources */,
 				FD66863C2968D8A700FD8C4A /* ContentView.swift in Sources */,
+				FD1F702329A7DD8800B2D690 /* Keyboard.swift in Sources */,
 				FD66863A2968D8A700FD8C4A /* SynthesizerApp.swift in Sources */,
 				FD66866C2968E6EF00FD8C4A /* Oscillator.swift in Sources */,
 			);

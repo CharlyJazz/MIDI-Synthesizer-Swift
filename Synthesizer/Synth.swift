@@ -90,6 +90,7 @@ class Synth<SynthProtocol> {
     public func attachSourceNode(midiKeyCode: UInt8) {
         let frequency: Float = Oscillator.midiNoteToFreq(midiKeyCode)
         let sourceNode = createSourceNode(frequency: frequency,  midiKeyCode: midiKeyCode)
+        detachSourceNode(midiKeyCode: midiKeyCode)
         hashNotesSourceNodes[midiKeyCode] = sourceNode
         audioEngine.attach(sourceNode)
         audioEngine.connect(

@@ -16,6 +16,7 @@ struct SynthesizerApp: App {
             ContentView()
                 .onAppear(perform: MIDI.connect)
                 .onDisappear(perform: MIDI.connect)
+                .frame(width: 1000, height: 150)
         }
     }
 }

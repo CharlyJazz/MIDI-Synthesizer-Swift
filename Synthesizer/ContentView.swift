@@ -13,10 +13,17 @@ struct ContentView: View {
     @State public var synth = Synth<any SynthProtocol>()
     @State private var observerTokens = [MIDIObserverTokens]()
     
-    var body: some View {
-        HStack(spacing: 8.0) {
-            Text("Detecting Keyboard MIDI Notes")
+    func keyboardTapKeyOn(code: Int) {
+        synth.attachSourceNode(midiKeyCode: UInt8(code))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            synth.detachSourceNode(midiKeyCode: UInt8(code))
         }
+    }
+    
+    var body: some View {
+        HStack(alignment: .center) {
+            Keyboard(onTapKey: keyboardTapKeyOn)
+        }.offset(x: 100)
         .padding()
         .onAppear(perform: subscribe)
         .onDisappear(perform: unsubscribe)
