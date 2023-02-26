@@ -1,10 +1,11 @@
-# MIDI Synthesizer written in Swift
+# MIDI Synthesizer 
 
-Very simple and buggy currently
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/12489333/221440968-059e5b2c-3f9c-428d-9e0b-eaa5e4f668c1.png" width="500" title="UI Synth">
+</p>
 
-# Research History:
-
-- https://developer.apple.com/documentation/avfaudio/audio_engine
-- https://betterprogramming.pub/building-a-synthesizer-in-swift-866cd15b731
-- https://youtu.be/PLuBamvtBZU?t=412
-- https://youtu.be/ubCMI3Jq6e4
+- Written in Swift
+- Very simple
+- Buggy as hell
+- Can be use with a Midi controller
+- You can press the key buttons in the UI
