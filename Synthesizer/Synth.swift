@@ -17,8 +17,6 @@ protocol SynthProtocol: ObservableObject {
 let LIST_MIDI_CODE = (21...108)
 
 class Synth<SynthProtocol> {
-    // MARK: Properties
-//    public static let shared = Synth()
     public var volume: Float {
         set {
             audioEngine.mainMixerNode.outputVolume = newValue
@@ -38,7 +36,7 @@ class Synth<SynthProtocol> {
     private let format: AVAudioFormat
     private var signal: Signal
     
-    init(signal: @escaping Signal = Oscillator.sine) {
+    init(signal: @escaping Signal = Oscillator.piano) {
         audioEngine = AVAudioEngine()
         
         for code in LIST_MIDI_CODE {
@@ -69,24 +67,36 @@ class Synth<SynthProtocol> {
            print("Could not start engine: \(error.localizedDescription)")
         }
     }
-     
+
+    //    This code uses the pointee property to access the
+    //    underlying AudioBuffer struct,
+    //    and calculates the stride manually based on the
+    //    number of channels and the size of the buffer's
+    //    element. It then creates an UnsafeMutableBufferPointer
+    //    based on the mData property of the
+    //    AudioBuffer, and uses that to write the sample
+    //    value for each channel.
     private func createSourceNode(frequency: Float, midiKeyCode: UInt8) -> AVAudioSourceNode {
         return AVAudioSourceNode { (_, _, frameCount, audioBufferList) -> OSStatus in
-           let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
-           for frame in 0..<Int(frameCount) {
-               if ((self.hashNotesTimes[midiKeyCode]) != nil) {
-                   let sampleVal = self.signal(self.hashNotesTimes[midiKeyCode]!, frequency)
-                   self.hashNotesTimes[midiKeyCode]! += self.deltaTime
-                   for buffer in ablPointer {
-                       let buf: UnsafeMutableBufferPointer<Float> = UnsafeMutableBufferPointer(buffer)
-                       buf[frame] = sampleVal
-                   }
-               }
-           }
-           return noErr
-       }
+            let numChannels = Int(audioBufferList.pointee.mNumberBuffers)
+            let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
+            
+            for frame in 0..<Int(frameCount) {
+                if let time = self.hashNotesTimes[midiKeyCode] {
+                    let sampleVal = self.signal(time, frequency)
+                    self.hashNotesTimes[midiKeyCode] = time + self.deltaTime
+                    
+                    for channel in 0..<numChannels {
+                        let buf = UnsafeMutableBufferPointer(start: ablPointer[channel].mData?.assumingMemoryBound(to: Float.self), count: Int(frameCount))
+                        buf[frame] = sampleVal
+                    }
+                }
+            }
+            
+            return noErr
+        }
     }
-    
+
     public func attachSourceNode(midiKeyCode: UInt8) {
         let frequency: Float = Oscillator.midiNoteToFreq(midiKeyCode)
         let sourceNode = createSourceNode(frequency: frequency,  midiKeyCode: midiKeyCode)
