@@ -9,63 +9,73 @@ import Foundation
 
 typealias Signal = (Float, Float) -> (Float)
 
-struct Oscillator {
+class Oscillator {
     // The amplitude of the oscillator's output signal
     static var amplitude: Float = 1
     
     // The sample rate of the audio system
-    static let sampleRate: Float = 44100.0
+    let sampleRate: Double
     
     // The attack time of the ADSR envelope (in seconds)
-    static var attackTime: Float = 0.01 // Why is reseting as the value?
+    static var attackTime: Float = 0.02
     
     // The decay time of the ADSR envelope (in seconds)
-    static var decayTime: Float = 0.1
+    static var decayTime: Float = 0.2
     
     // The sustain level of the ADSR envelope (between 0 and 1)
-    static var sustainLevel: Float = 0.5
+    static var sustainLevel: Float = 0.4
     
     // The release time of the ADSR envelope (in seconds)
-    static var releaseTime: Float = 0.1
+    static var releaseTime: Float = 0.6
+    
+    init(sampleRate: Double) {
+        self.sampleRate = sampleRate
+    }
     
     // Generate an ADSR envelope for a given time
-    static func adsrEnvelope(time: Float) -> Float {
-        let attackSamples = Int(attackTime * sampleRate)
-        let decaySamples = Int(decayTime * sampleRate)
-        let releaseSamples = Int(releaseTime * sampleRate)
+    func adsrEnvelope(time: Float) -> Float {
+        let attackSamples = Int(Double(Oscillator.attackTime) * sampleRate)
+        let decaySamples = Int(Double(Oscillator.decayTime) * sampleRate)
+        let releaseSamples = Int(Double(Oscillator.releaseTime) * sampleRate)
         
         // Calculate the envelope value for the current time
-        if time < attackTime {
+        if time < Oscillator.attackTime {
             // Attack phase
             let attackDelta = Oscillator.amplitude / Float(attackSamples)
-            return attackDelta * Float(time * sampleRate)
-        } else if time < (attackTime + decayTime) {
+            return attackDelta * Float(Double(time) * sampleRate)
+        } else if time < (Oscillator.attackTime + Oscillator.decayTime) {
             // Decay phase
-            let decayDelta = (Oscillator.amplitude - sustainLevel) / Float(decaySamples)
-            let decayTime = time - attackTime
-            return Oscillator.amplitude - decayDelta * Float(decayTime * sampleRate)
-        } else if time < (attackTime + decayTime + sustainLevel) {
-            // Sustain phase
-            return sustainLevel
+            let decayDelta = (Oscillator.amplitude - Oscillator.sustainLevel) / Float(decaySamples)
+            let decayTime = time - Oscillator.attackTime
+            return Oscillator.amplitude - decayDelta * Float(Double(decayTime) * sampleRate)
+        } else if time < (Oscillator.attackTime + Oscillator.decayTime + Oscillator.sustainLevel) {
+            return Oscillator.sustainLevel
         } else {
             // Release phase
-            let releaseDelta = sustainLevel / Float(releaseSamples)
-            let releaseTime = time - (attackTime + decayTime + sustainLevel)
-            return sustainLevel - releaseDelta * Float(releaseTime * sampleRate)
+            let releaseDelta = Oscillator.sustainLevel / Float(releaseSamples)
+            let releaseTime = time - (Oscillator.attackTime + Oscillator.decayTime + Oscillator.sustainLevel)
+            let releaseLevel = Oscillator.sustainLevel - releaseDelta * Float(Double(releaseTime) * sampleRate)
+            if releaseLevel <= 0 {
+//                https://github.com/anujagannath24/ADSRenvelope/blob/master/ADSR.c
+//                Still need figure out the reset attack for next time with press same key
+                return 0
+            } else {
+                return releaseLevel
+            }
         }
     }
     
     // The sine wave signal generator function that takes a time and frequency and returns the sample value of a sine wave at that time and frequency
-    static let sine = { (time: Float, frequency: Float) -> Float in
+    func sine(time: Float, frequency: Float) -> Float {
         // Generate the sine wave sample value at the given time and frequency
         let sineValue = sin(2.0 * Float.pi * frequency * time)
         
         // Apply the ADSR envelope to the sine wave sample value
         let envelopeValue = adsrEnvelope(time: time)
-        return amplitude * envelopeValue * sineValue
+        return Oscillator.amplitude * envelopeValue * sineValue
     }
     
-    static let piano = { (time: Float, frequency: Float) -> Float in
+    func piano(time: Float, frequency: Float) -> Float {
         let harmonic1 = Oscillator.amplitude * sin(2.0 * Float.pi * frequency * time)
         let harmonic2 = (Oscillator.amplitude / 2) * sin(2.0 * Float.pi * 2 * frequency * time)
         let harmonic3 = (Oscillator.amplitude / 3) * sin(2.0 * Float.pi * 3 * frequency * time)
@@ -73,17 +83,12 @@ struct Oscillator {
         let harmonic5 = (Oscillator.amplitude / 5) * sin(2.0 * Float.pi * 5 * frequency * time)
         let harmonic6 = (Oscillator.amplitude / 6) * sin(2.0 * Float.pi * 6 * frequency * time)
         
-        let nonLinearDistortion = tanh(harmonic1 + harmonic2 + harmonic3 + harmonic4 + harmonic5 + harmonic6)
-    
         // Apply ADSR envelope
-        // I need debug the adsrEnvelope method because it has a weird behavior
-        // let envelope = adsrEnvelope(time: time)
-        // return nonLinearDistortion * envelope
-        
-        return nonLinearDistortion
+        let envelope = adsrEnvelope(time: time)
+        return envelope * tanh(harmonic1 + harmonic2 + harmonic3 + harmonic4 + harmonic5 + harmonic6)
     }
 
-    static let midiNoteToFreq = { (midiNumber: UInt8) -> Float in
+    static func midiNoteToFreq(midiNumber: UInt8) -> Float {
         return (440 / 32) * pow(2, ( (Float(midiNumber) - 9) / 12 ))
     }
 }

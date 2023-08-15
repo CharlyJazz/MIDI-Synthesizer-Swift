@@ -36,17 +36,18 @@ class Synth<SynthProtocol> {
     private let format: AVAudioFormat
     private var signal: Signal
     
-    init(signal: @escaping Signal = Oscillator.piano) {
+    init() {
         audioEngine = AVAudioEngine()
         
         for code in LIST_MIDI_CODE {
             self.hashNotesTimes[UInt8(code)] = 0
         }
-
+        
         self.mainMixer = audioEngine.mainMixerNode
         self.outputNode = audioEngine.outputNode
         self.format = outputNode.inputFormat(forBus: 0)
         self.sampleRate = self.format.sampleRate
+        self.signal = Oscillator(sampleRate: self.sampleRate).piano
         self.inputFormat = AVAudioFormat(
             commonFormat: self.format.commonFormat,
             sampleRate: self.sampleRate,
@@ -56,8 +57,6 @@ class Synth<SynthProtocol> {
         
         self.deltaTime = 1 / Float(self.sampleRate) // 1 / 44,100
         
-        self.signal = signal
-
         audioEngine.connect(mainMixer, to: outputNode, format: nil)
         mainMixer.outputVolume = 0
 
@@ -98,7 +97,7 @@ class Synth<SynthProtocol> {
     }
 
     public func attachSourceNode(midiKeyCode: UInt8) {
-        let frequency: Float = Oscillator.midiNoteToFreq(midiKeyCode)
+        let frequency: Float = Oscillator.midiNoteToFreq(midiNumber: midiKeyCode)
         let sourceNode = createSourceNode(frequency: frequency,  midiKeyCode: midiKeyCode)
         detachSourceNode(midiKeyCode: midiKeyCode)
         hashNotesSourceNodes[midiKeyCode] = sourceNode
